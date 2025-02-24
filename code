@@ -1,0 +1,72 @@
+import pytesseract
+import cv2
+import numpy as np
+import pyautogui
+import time
+import tkinter as tk
+from PIL import Image, ImageTk
+from nltk.tokenize import word_tokenize
+import pyttsx3
+import threading
+import csv
+from tkinter import messagebox, simpledialog
+
+# Load AI/ML glossary terms
+AI_ML_TERMS = set([
+    "Machine Learning", "Artificial Intelligence", "Neural Network", "Deep Learning", "Gradient Descent",
+    "Supervised Learning", "Unsupervised Learning", "Reinforcement Learning", "Overfitting", "Underfitting",
+    "Convolutional Neural Network", "Natural Language Processing", "Support Vector Machine", "Bayesian Network",
+    "Decision Tree", "Random Forest", "Logistic Regression", "Linear Regression", "Feature Engineering",
+    "Hyperparameter Tuning", "Data Augmentation", "Data Preprocessing", "Activation Function", "Optimization Algorithm",
+    "Batch Normalization", "Backpropagation", "Dropout", "Early Stopping", "Vanishing Gradient Problem",
+    "Exploding Gradient Problem", "Principal Component Analysis", "t-SNE", "Autoencoder", "Transfer Learning",
+    "Recurrent Neural Network", "Long Short-Term Memory", "Gated Recurrent Unit", "Attention Mechanism",
+    "Transformer Model", "BERT", "GPT", "Meta Learning", "Few-Shot Learning", "Self-Supervised Learning",
+    "Semi-Supervised Learning", "Zero-Shot Learning", "Clustering", "Anomaly Detection", "Association Rule Learning",
+    "Markov Decision Process", "Monte Carlo Method", "Bayesian Inference", "Expectation-Maximization",
+    "Graph Neural Networks", "Reinforcement Learning Agent", "Policy Gradient", "Q-Learning", "Deep Q-Network",
+    "Multi-Armed Bandit", "Evolutionary Algorithms", "Genetic Algorithm", "Swarm Intelligence",
+    "Artificial Immune Systems", "Fuzzy Logic", "Expert Systems", "Knowledge Representation", "Ontology Learning",
+    "Symbolic AI", "Heuristic Search", "Constraint Satisfaction Problem", "Game Theory", "Adversarial Machine Learning",
+    "Fairness in AI", "Explainability in AI", "Bias in Machine Learning", "Algorithmic Transparency", "Causal Inference",
+    "Gradient Boosting", "XGBoost", "LightGBM", "CatBoost", "Bagging", "Stacking", "Ensemble Learning",
+    "Word Embeddings", "TF-IDF", "Word2Vec", "GloVe", "FastText", "BERT Embeddings", "Graph Embeddings",
+    "Self-Attention", "Masked Language Model", "Sequence-to-Sequence Model", "BLEU Score", "ROUGE Score",
+    "Perplexity", "Data Leakage", "Overlapping Data", "Hyperparameter Optimization", "Grid Search", "Random Search",
+    "Bayesian Optimization", "Neural Architecture Search", "Federated Learning", "Edge AI", "On-Device Learning",
+    "Neural Turing Machines", "Differentiable Programming", "Neurosymbolic AI", "Quantum Machine Learning",
+    "Quantum Neural Networks", "Quantum Annealing", "Machine Unlearning", "Catastrophic Forgetting",
+    "Continual Learning", "Life-Long Learning", "Incremental Learning", "Domain Adaptation", "Few-Shot Adaptation",
+    "Contrastive Learning", "Metric Learning", "Graph Representation Learning", "Deep Reinforcement Learning",
+    "Sparse Representations", "Variational Autoencoders", "Energy-Based Models", "Bayesian Deep Learning",
+    "Markov Chains", "Hidden Markov Models", "Latent Variable Models", "Gaussian Processes",
+    "Information Bottleneck", "Neural Tangent Kernel", "Kolmogorov Complexity", "Solomonoff Induction",
+    "Neural Ordinary Differential Equations", "Physics-Informed Neural Networks", "Neural Style Transfer",
+    "GANs", "CycleGAN", "Pix2Pix", "StyleGAN", "AI Ethics", "AI Governance", "AI Regulation",
+    "Synthetic Data", "Data Augmentation Techniques", "Robust Machine Learning", "Adversarial Attacks",
+    "Defense Against Adversarial Attacks", "Gradient Masking", "Differential Privacy", "Homomorphic Encryption",
+    "Federated Privacy", "Secure Multi-Party Computation", "Privacy-Preserving AI", "Explainable Reinforcement Learning",
+    "Human-in-the-Loop AI", "Crowdsourcing for AI", "AI Benchmarking", "AI Interpretability Methods",
+    "Shapley Values", "LIME", "Integrated Gradients", "Deep SHAP", "CAM", "Grad-CAM", "Saliency Maps",
+    "Global vs Local Interpretability", "Counterfactual Explanations", "Causal ML", "Ethical AI Design",
+    "Algorithmic Bias Mitigation", "AI Fairness Metrics", "Disentangled Representations", "Self-Organizing Maps",
+    "AI for Healthcare", "AI for Finance", "AI for Education", "AI for Cybersecurity", "AI for Climate Science",
+    "Bayesian Neural Networks", "Knowledge Distillation", "AutoML", "Neural Machine Translation",
+    "Speech Recognition", "Image Captioning", "Object Detection", "Semantic Segmentation",
+    "Instance Segmentation", "Text-to-Speech", "Speech-to-Text", "Computer Vision",
+    "Recurrent Attention Models", "Memory-Augmented Neural Networks", "Deep Belief Networks",
+    "Sparse Autoencoders", "Contrastive Divergence", "Hierarchical Reinforcement Learning",
+    "Symbolic Regression", "AI-Generated Content", "Few-Shot Prompting", "Prompt Engineering",
+    "AI Code Generation", "Multi-Modal AI", "Self-Evolving Neural Networks", "Algorithmic Fairness",
+    "Inverse Reinforcement Learning", "Open-Domain Question Answering", "Multimodal Learning",
+    "Scene Understanding", "Meta-Reinforcement Learning", "Brain-Inspired AI",
+    "Explainable NLP", "Hierarchical Clustering", "Self-Improving Algorithms", "Trustworthy AI"
+])
+
+# Configure Tesseract OCR (Update path if necessary)
+pytesseract.pytesseract.tesseract_cmd = r'C:\\Program Files\\Tesseract-OCR\\tesseract.exe'
+
+# Initialize text-to-speech engine
+tts_engine = pyttsx3.init()
+
+# The rest of the script remains unchanged
